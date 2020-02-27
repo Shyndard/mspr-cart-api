@@ -1,0 +1,44 @@
+####
+# mvn package -Pnative -Dquarkus.native.container-build=true
+# docker build -f src/main/docker/Dockerfile.native -t quarkus/cartapi .
+# docker run -i --rm -p 8080:8080 quarkus/cartapi
+###
+
+##################################
+### FIRST STEP : BUILD PROJECT ###
+##################################
+
+FROM oracle/graalvm-ce:19.3.1-java8 as builder
+
+WORKDIR /maven/
+
+RUN yum install wget -y
+RUN wget http://mirror.ibcp.fr/pub/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz -O /maven/maven.tar.gz
+RUN tar -zxvf /maven/maven.tar.gz
+
+ENV M2_HOME=/maven/apache-maven-3.6.3
+ENV PATH=${M2_HOME}/bin:${PATH}
+
+WORKDIR /build/
+
+COPY . /build/app
+
+RUN gu install native-image
+
+RUN mvn -f /build/app/pom.xml package -Pnative
+
+###################################
+### SECOND STEP : PREPARE IMAGE ###
+###################################
+
+FROM registry.access.redhat.com/ubi8/ubi-minimal
+
+WORKDIR /work/
+
+COPY target/*-runner /work/application
+
+RUN chmod 775 /work
+
+EXPOSE 8080
+
+CMD ["./application", "-Dquarkus.http.host=0.0.0.0"]
