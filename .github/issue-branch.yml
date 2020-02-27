@@ -1,0 +1,15 @@
+mode: chatops
+branchName: short
+branches:
+  - label: breakingchange
+    prefix: breakingchange/
+  - label: enhancement
+    prefix: feature/
+  - label: bug
+    prefix: fix/
+  - label: documentation
+    prefix: doc/
+  - label: ci
+    prefix: ci/
+  - label: "*"
+    prefix: issue/
