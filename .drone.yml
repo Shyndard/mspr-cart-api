@@ -20,7 +20,3 @@ steps:
       CI_SSH_KEY:
         from_secret: CI_SSH_KEY
     depends_on: [build]
-    when:
-      branch:
-      - master
-      event: push
