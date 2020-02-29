@@ -1,0 +1,27 @@
+kind: pipeline
+type: kubernetes
+name: default
+
+steps:
+  - name: test
+    image: maven:3.6.3-jdk-8
+    commands:
+      - mvn test
+  - name: build
+    image: maven:3.6.3-jdk-8
+    commands:
+      - mvn clean install -DskipTests=true
+    depends_on: [test]
+#  - name: Semantical Versionning
+#    image: python:3.6
+#    commands:
+#      - mkdir ~/.ssh
+#      - echo $CI_SSH_KEY > ~/.ssh/id_rsa
+#      - pip install -r .semver/requirements.txt
+#      - python .semver/main.py
+#    environment:
+#      CI_REPOSITORY_URL:
+#        from_secret: CI_REPOSITORY_URL
+#      CI_SSH_KEY:
+#        from_secret: CI_SSH_KEY
+ #   depends_on: [build]
