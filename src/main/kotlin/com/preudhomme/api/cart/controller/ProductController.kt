@@ -1,9 +1,9 @@
 package com.preudhomme.api.cart.controller;
 
 import com.preudhomme.api.cart.entity.Product
-import io.agroal.api.AgroalDataSource
+import com.preudhomme.api.cart.service.ProductService
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
-import java.sql.PreparedStatement
+import javax.enterprise.inject.Default
 import javax.inject.Inject
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
@@ -15,16 +15,16 @@ import javax.ws.rs.core.MediaType
 class ProductController {
 
     @Inject
-    private lateinit var dataSource: AgroalDataSource
-
+    @field: Default
+    lateinit var productService: ProductService
     @GET
     fun getAll(): Array<Product> {
-       return arrayOf()
+       return productService.getAllProducts()
     }
 
     @GET
     @Path("/{id}")
     fun getById(@PathParam("id") productId: String): Product?  {
-        return null
+        return productService.getProductById(productId)
     }
 }

@@ -5,7 +5,8 @@ CREATE extension "uuid-ossp";
 CREATE table product(
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 	price NUMERIC(10,2),
-	name varchar(50)
+	name varchar(50),
+	tva NUMERIC(4,2)
 );
 
 CREATE table cart (

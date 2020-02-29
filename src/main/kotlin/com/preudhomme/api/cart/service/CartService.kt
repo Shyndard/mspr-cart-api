@@ -8,6 +8,7 @@ import io.agroal.api.AgroalDataSource
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import javax.enterprise.context.ApplicationScoped
+import javax.enterprise.inject.Default
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,6 +16,7 @@ import javax.inject.Singleton
 class CartService {
 
     @Inject
+    @field: Default
     private lateinit var defaultDataSource: AgroalDataSource
 
     fun getCartByUser(userId: String) : Cart? {
