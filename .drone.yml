@@ -3,10 +3,15 @@ type: kubernetes
 name: default
 
 steps:
+  - name: test
+    image: maven:3.6.3-jdk-8
+    commands:
+      - mvn test
   - name: build
     image: maven:3.6.3-jdk-8
     commands:
-      - mvn clean install
+      - mvn clean install -DskipTests=true
+    depends_on: [test]
   - name: Semantical Versionning
     image: python:3.6
     commands:
