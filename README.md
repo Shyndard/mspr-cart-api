@@ -1,3 +1,4 @@
+![CI Test result](https://drone.k3d.dev/api/badges/Shyndard/mspr-cart-api/status.svg)
 # cartapi project
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
