@@ -43,3 +43,6 @@ steps:
     depends_on: [build, test]
     when:
       branch: master
+volumes:
+  - name: cache
+    temp: {}
