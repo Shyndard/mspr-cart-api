@@ -35,8 +35,8 @@ steps:
       - cat .kube/deployment.yaml | envsubst | kubectl apply -f -
       - kubectl rollout restart deployment/mspr-cart-api-deployment -n prod-mspr-ci 
     environment:
-      DATABASE_URL:
-        from_secret: DATABASE_URL
+      DB_URL:
+        from_secret: DB_URL
       DB_USERNAME:
         from_secret: DB_USERNAME
       DB_PASSWORD:
