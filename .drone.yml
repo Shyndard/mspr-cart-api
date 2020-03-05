@@ -30,6 +30,6 @@ steps:
     environment:
       GITHUB_EMAIL:
         from_secret: GITHUB_EMAIL
-    depends_on: [build, test]
+    depends_on: [build, test, code-analysis]
     when:
       branch: master
