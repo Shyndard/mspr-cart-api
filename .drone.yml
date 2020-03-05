@@ -26,5 +26,5 @@ steps:
       GITHUB_EMAIL:
         from_secret: GITHUB_EMAIL
     depends_on: [build, test]
-  #   when:
-  #     branch: master
+    when:
+      branch: master
