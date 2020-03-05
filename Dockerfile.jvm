@@ -1,40 +1,18 @@
 ####
-# This Dockerfile is used in order to build a container that runs the Quarkus application in JVM mode
-#
-# Before building the docker image run:
-#
-# mvn package
-#
-# Then, build the image with:
-#
-# docker build -f src/main/docker/Dockerfile.jvm -t quarkus/cartapi-jvm .
-#
-# Then run the container using:
-#
+# docker build -f Dockerfile.jvm -t quarkus/cartapi-jvm .
 # docker run -i --rm -p 8080:8080 quarkus/cartapi-jvm
-#
 ###
 
 ##################
 ### FIRST STEP ###
 ##################
 
-FROM openjdk:8u242-jdk AS build
+FROM maven:3.6.3-jdk-8 AS build
 
-WORKDIR /maven/
-
-RUN apt install wget -y
-RUN wget http://mirror.ibcp.fr/pub/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz -O /maven/maven.tar.gz
-RUN tar -zxvf /maven/maven.tar.gz
-
-ENV M2_HOME=/maven/apache-maven-3.6.3
-ENV PATH=${M2_HOME}/bin:${PATH}
-
-WORKDIR /build/
-
-COPY . /build/app
-
-RUN mvn verify -Pnative
+WORKDIR /compile/
+COPY . .
+RUN mvn package -DskipTests=true
+RUN ls /compile/target
 
 ###################
 ### SECOND STEP ###
@@ -64,8 +42,9 @@ RUN microdnf install openssl curl ca-certificates ${JAVA_PACKAGE} \
 # Configure the JAVA_OPTIONS, you can add -XshowSettings:vm to also display the heap size.
 ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 
-COPY target/lib/* /deployments/lib/
-COPY target/*-runner.jar /deployments/app.jar
+
+COPY  --from=build /compile/target/lib/* /deployments/lib/
+COPY  --from=build /compile/target/*-runner.jar /deployments/app.jar
 
 EXPOSE 8080
 USER 1001
