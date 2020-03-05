@@ -6,7 +6,7 @@ steps:
   - name: install_dependencies
     image: maven:3.6.3-jdk-8
     commands:
-      - mvn dependency
+      - mvn dependency:purge-local-repository
     volumes:
       - name: cache
         path: /root/.m2/repository
