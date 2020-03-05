@@ -9,22 +9,22 @@ steps:
       - mvn dependency:purge-local-repository
     volumes:
       - name: cache
-        path: /root/.m2/repository
+        path: /root/.m2/
   - name: test
     image: maven:3.6.3-jdk-8
     commands:
-      - mvn test
+      - mvn test -o
     volumes:
       - name: cache
-        path: /root/.m2/repository
+        path: /root/.m2/
     depends_on: [install_dependencies]
   - name: build
     image: maven:3.6.3-jdk-8
     commands:
-      - mvn clean install -DskipTests=true
+      - mvn clean install -DskipTests=true -o
     volumes:
       - name: cache
-        path: /root/.m2/repository
+        path: /root/.m2/
     depends_on: [install_dependencies]
   - name: create_docker
     image: banzaicloud/drone-kaniko
