@@ -11,17 +11,20 @@ steps:
     image: maven:3.6.3-jdk-8
     commands:
       - mvn clean install -DskipTests=true
-    depends_on: [test]
-#  - name: Semantical Versionning
-#    image: python:3.6
-#    commands:
-#      - mkdir ~/.ssh
-#      - echo $CI_SSH_KEY > ~/.ssh/id_rsa
-#      - pip install -r .semver/requirements.txt
-#      - python .semver/main.py
-#    environment:
-#      CI_REPOSITORY_URL:
-#        from_secret: CI_REPOSITORY_URL
-#      CI_SSH_KEY:
-#        from_secret: CI_SSH_KEY
- #   depends_on: [build]
+  - name: create_docker
+    image: banzaicloud/drone-kaniko
+    settings:
+      email: $GITHUB_EMAIL
+      dockerfile: ./Dockerfile.jvm
+      registry: docker.pkg.github.com
+      repo: shyndard/mspr-cart-api/api
+      username:
+        from_secret: github_username
+      password:
+        from_secret: github_token
+    environment:
+      GITHUB_EMAIL:
+        from_secret: GITHUB_EMAIL
+    depends_on: [build, test]
+  #   when:
+  #     branch: master
