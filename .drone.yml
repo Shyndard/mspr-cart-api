@@ -3,20 +3,14 @@ type: kubernetes
 name: default
 
 steps:
-  - name: install_dependencies
-    image: maven:3.6.3-jdk-8
-    commands:
-      - mvn dependency:purge-local-repository
   - name: test
     image: maven:3.6.3-jdk-8
     commands:
       - mvn test
-    depends_on: [install_dependencies]
   - name: build
     image: maven:3.6.3-jdk-8
     commands:
       - mvn clean install -DskipTests=true
-    depends_on: [install_dependencies]
   - name: create_docker
     image: banzaicloud/drone-kaniko
     settings:
