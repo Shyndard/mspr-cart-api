@@ -1,6 +1,6 @@
--- POSTGRESQL DATABASE 
+-- POSTGRESQL DATABASE
 
-CREATE extension "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE table product(
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
