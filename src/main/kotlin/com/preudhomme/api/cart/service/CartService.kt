@@ -31,12 +31,12 @@ class CartService {
     }
 
     fun getProductOfUserCart(userId: UUID): Array<CartProduct> {
-        val preStatement: PreparedStatement = defaultDataSource.connection.prepareStatement("select * from cart_product JOIN product on id = product_id where user_id = ?::UUID")
+        val preStatement: PreparedStatement = defaultDataSource.connection.prepareStatement("select p.*, cp.amount as amount, v.name as vat_type from cart_product as cp JOIN product as p on p.id = cp.product_id JOIN vat AS v ON v.id = p.vat where user_id = ?::UUID")
         preStatement.setObject(1, userId)
         val result: ResultSet = preStatement.executeQuery()
         var list = mutableListOf<CartProduct>()
         while(result.next()) {
-            list.add(CartProduct(result.getObject("id") as UUID, result.getString("name"), result.getFloat("price"), result.getInt("amount")))
+            list.add(CartProduct(result.getObject("id") as UUID, result.getString("name"), result.getFloat("price"), result.getInt("amount"), result.getString("vat_type")))
         }
         return list.toTypedArray()
     }
