@@ -3,6 +3,11 @@ type: kubernetes
 name: default
 
 steps:
+  - name: code-analysis
+    image: aosapps/drone-sonar-plugin
+    settings:
+      sonar_host:
+        from_secret: sonar_host
   - name: test
     image: maven:3.6.3-jdk-8
     commands:
@@ -25,6 +30,6 @@ steps:
     environment:
       GITHUB_EMAIL:
         from_secret: GITHUB_EMAIL
-    depends_on: [build, test]
+    depends_on: [build, test, code-analysis]
     when:
       branch: master
