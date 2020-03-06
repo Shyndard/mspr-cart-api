@@ -38,10 +38,14 @@ steps:
     commands:
       - echo $KUBE_CONFIG > ~/.kube/config
       - cat .kube/deployment.yaml | envsubst | kubectl apply -f -
-      - kubectl rollout restart deployment/mspr-ci-cart-api-deployment -n prod-mspr-ci 
+      - kubectl rollout restart deployment/mspr-cart-api-deployment -n prod-mspr-ci
     environment:
-      DATABASE_URL:
-        from_secret: DATABASE_URL
+      DB_URL:
+        from_secret: DB_URL
+      DB_USERNAME:
+        from_secret: DB_USERNAME
+      DB_PASSWORD:
+        from_secret: DB_PASSWORD
       KUBE_CONFIG:
         from_secret: KUBE_CONFIG
     depends_on: [create_docker]
