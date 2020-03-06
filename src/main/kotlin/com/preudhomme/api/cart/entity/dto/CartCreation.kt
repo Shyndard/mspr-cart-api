@@ -1,3 +1,5 @@
 package com.preudhomme.api.cart.entity.dto
 
-data class CartCreation(val userId: String, val products: Array<CartProductCreation>)
+import java.util.*
+
+data class CartCreation(val userId: UUID, val products: Array<CartProductCreation>)
