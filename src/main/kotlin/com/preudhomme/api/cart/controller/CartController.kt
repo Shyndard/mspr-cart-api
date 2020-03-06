@@ -8,13 +8,14 @@ import com.preudhomme.api.cart.service.CartService
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
+import java.util.*
 import javax.enterprise.inject.Default
 import javax.inject.Inject
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 
-@Path("/cart/")
+@Path("/carts/")
 @Tag(name = "cart", description = "Cart operations.")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -27,7 +28,7 @@ class CartController {
     @GET
     @Path("/user/{userId}")
     @APIResponse(responseCode = "200", description = "Getting user cart")
-    fun getByUser(@PathParam("userId") userId: String): Cart? {
+    fun getByUser(@PathParam("userId") userId: UUID): Cart? {
         return cartService.getCartByUser(userId)
     }
 
@@ -40,21 +41,21 @@ class CartController {
     @POST
     @APIResponse(responseCode = "201", description = "Creating user cart product")
     @Path("/user/{userId}/products")
-    fun add(@PathParam("userId") userId: String, @RequestBody cartProducts: Array<CartProductCreation>): Array<CartProduct> {
+    fun add(@PathParam("userId") userId: UUID, @RequestBody cartProducts: Array<CartProductCreation>): Array<CartProduct> {
         return cartService.addProductsToUserCart(userId, cartProducts);
     }
 
     @PUT
     @APIResponse(responseCode = "200", description = "Updating user cart product")
     @Path("/user/{userId}/products")
-    fun update(@PathParam("userId") userId: String, @RequestBody cartProducts: Array<CartProductCreation>): Array<CartProduct> {
+    fun update(@PathParam("userId") userId: UUID, @RequestBody cartProducts: Array<CartProductCreation>): Array<CartProduct> {
         return cartService.updateProductsOfUserCart(userId, cartProducts);
     }
 
     @DELETE
     @APIResponse(responseCode = "200", description = "Deleting user cart product")
     @Path("/user/{userId}/products")
-    fun delete(@PathParam("userId") userId: String, @RequestBody cartProducts: Array<String>): Array<CartProduct> {
+    fun delete(@PathParam("userId") userId: UUID, @RequestBody cartProducts: Array<UUID>): Array<CartProduct> {
         return cartService.deleteProductsOfUserCart(userId, cartProducts);
     }
 }
