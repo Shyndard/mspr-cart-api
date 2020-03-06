@@ -33,3 +33,15 @@ steps:
     depends_on: [build, test, code-analysis]
     when:
       branch: master
+  - name: rollout
+    image: pabloclsn/kubectl-docker:latest
+    commands:
+      - echo $KUBE_CONFIG > ~/.kube/config
+      - cat .kube/deployment.yaml | envsubst | kubectl apply -f -
+      - kubectl rollout restart deployment/mspr-ci-cart-api-deployment -n prod-mspr-ci 
+    environment:
+      DATABASE_URL:
+        from_secret: DATABASE_URL
+      KUBE_CONFIG:
+        from_secret: KUBE_CONFIG
+    depends_on: [create_docker]
