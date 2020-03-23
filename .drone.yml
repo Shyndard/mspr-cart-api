@@ -16,7 +16,6 @@ steps:
     commands:
       - mvn clean install -DskipTests=true
 
----
 kind: pipeline
 name: deploy
 
@@ -51,7 +50,7 @@ steps:
       KUBE_CONFIG:
         from_secret: KUBE_CONFIG
     depends_on: [create_docker]
-  when:
-    branch: master
-  depends_on:
-    - build
+when:
+  branch: master
+depends_on:
+  - build
