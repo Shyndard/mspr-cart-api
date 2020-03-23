@@ -1,5 +1,6 @@
 kind: pipeline
 name: build
+type: kubernetes
 
 steps:
   - name: code-analysis
@@ -18,6 +19,7 @@ steps:
 
 kind: pipeline
 name: deploy
+type: kubernetes
 
 steps:
   - name: create_docker
