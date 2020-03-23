@@ -16,36 +16,47 @@ import javax.inject.Inject
 class CartService {
 
     @Inject
-    @field: Default
-    private lateinit var defaultDataSource: AgroalDataSource
+    @Default
+    lateinit var defaultDataSource: AgroalDataSource
 
     fun getCartByUser(userId: UUID) : Cart? {
-        val preStatement: PreparedStatement = defaultDataSource.connection.prepareStatement("select * from cart where user_id = ?::UUID")
+        val connection = defaultDataSource.connection
+        val preStatement: PreparedStatement = connection.prepareStatement("select * from cart where user_id = ?::UUID")
         preStatement.setObject(1, userId)
         val result: ResultSet = preStatement.executeQuery()
         var cart: Cart? = null
         if (result.next()) {
             cart = Cart(result.getObject("user_id") as UUID, result.getDate("created_at"), getProductOfUserCart(userId))
         }
+        result.close()
+        preStatement.close()
+        connection.close()
         return cart
     }
 
     fun getProductOfUserCart(userId: UUID): Array<CartProduct> {
-        val preStatement: PreparedStatement = defaultDataSource.connection.prepareStatement("select p.*, cp.amount as amount, v.name as vat_type from cart_product as cp JOIN product as p on p.id = cp.product_id JOIN vat AS v ON v.id = p.vat where user_id = ?::UUID")
+        val connection = defaultDataSource.connection
+        val preStatement: PreparedStatement = connection.prepareStatement("select p.*, cp.amount as amount, v.name as vat_type from cart_product as cp JOIN product as p on p.id = cp.product_id JOIN vat AS v ON v.id = p.vat where user_id = ?")
         preStatement.setObject(1, userId)
         val result: ResultSet = preStatement.executeQuery()
         var list = mutableListOf<CartProduct>()
         while(result.next()) {
             list.add(CartProduct(result.getObject("id") as UUID, result.getString("name"), result.getFloat("price"), result.getInt("amount"), result.getString("vat_type")))
         }
+        result.close()
+        preStatement.close()
+        connection.close()
         return list.toTypedArray()
     }
 
     fun createUserCart(cartCreation: CartCreation) : Cart? {
         if(getCartByUser(cartCreation.userId) == null) {
-            val preStatement: PreparedStatement = defaultDataSource.connection.prepareStatement("INSERT INTO cart (user_id) VALUES (?::UUID)")
+            val connection = defaultDataSource.connection
+            val preStatement: PreparedStatement = connection.prepareStatement("INSERT INTO cart (user_id) VALUES (?)")
             preStatement.setObject(1, cartCreation.userId)
             preStatement.execute()
+            preStatement.close()
+            connection.close()
             addProductsToUserCart(cartCreation.userId, cartCreation.products)
             return getCartByUser(cartCreation.userId)
         }
@@ -58,31 +69,35 @@ class CartService {
     }
 
     private fun addProductToUserCart(userId: UUID, product: CartProductCreation) {
-        val preStatement: PreparedStatement = defaultDataSource.connection.prepareStatement("INSERT INTO cart_product (user_id, product_id, amount) VALUES (?, (SELECT id FROM product WHERE id = ?::UUID), ?)")
+        val connection = defaultDataSource.connection
+        val preStatement: PreparedStatement = connection.prepareStatement("INSERT INTO cart_product (user_id, product_id, amount) VALUES (?, (SELECT id FROM product WHERE id = ?), ?)")
         preStatement.setObject(1, userId)
         preStatement.setObject(2, product.id)
         preStatement.setInt(3, product.amount)
         try {
             preStatement.execute()
-        } catch (ex: Exception) {
-
+        } finally {
+            preStatement.close()
+            connection.close()
         }
     }
 
     fun updateProductsOfUserCart(userId: UUID, products: Array<CartProductCreation>): Array<CartProduct> {
-        products.forEach { cartProduct -> updateProductsOfUserCart(userId, cartProduct) }
+        products.forEach { cartProduct -> updateProductOfUserCart(userId, cartProduct) }
         return getProductOfUserCart(userId)
     }
 
-    private fun updateProductsOfUserCart(userId: UUID, product: CartProductCreation) {
-        val preStatement: PreparedStatement = defaultDataSource.connection.prepareStatement("UPDATE cart_product SET amount = ? WHERE user_id = ? AND product_id = ?")
+    private fun updateProductOfUserCart(userId: UUID, product: CartProductCreation) {
+        val connection = defaultDataSource.connection
+        val preStatement: PreparedStatement = connection.prepareStatement("UPDATE cart_product SET amount = ? WHERE user_id = ? AND product_id = ?")
         preStatement.setInt(1, product.amount)
         preStatement.setObject(2, userId)
         preStatement.setObject(3, product.id)
         try {
             preStatement.execute()
-        } catch (ex: Exception) {
-
+        } finally {
+            preStatement.close()
+            connection.close()
         }
     }
 
@@ -92,13 +107,42 @@ class CartService {
     }
 
     fun deleteProductOfUserCart(userId: UUID, productId: UUID) {
+        val connection = defaultDataSource.connection
         val preStatement: PreparedStatement = defaultDataSource.connection.prepareStatement("DELETE FROM cart_product WHERE user_id = ? AND product_id = ?")
         preStatement.setObject(1, userId)
         preStatement.setObject(2, productId)
         try {
             preStatement.execute()
-        } catch (ex: Exception) {
-
+        } finally {
+            preStatement.close()
+            connection.close()
         }
+    }
+
+    fun clear() {
+        var connection = defaultDataSource.connection;
+        var statement = connection.prepareStatement("DELETE FROM cart_product")
+        statement.execute()
+        statement.close()
+
+        statement = connection.prepareStatement("DELETE FROM cart")
+        statement.execute()
+        statement.close()
+
+        connection.close()
+    }
+
+    fun totalUpdate(userId: UUID, cartProducts: Array<CartProductCreation>): Array<CartProduct> {
+        val connection = defaultDataSource.connection
+        val preStatement: PreparedStatement = defaultDataSource.connection.prepareStatement("DELETE FROM cart_product WHERE user_id = ?")
+        preStatement.setObject(1, userId)
+        try {
+            preStatement.execute()
+        } finally {
+            preStatement.close()
+            connection.close()
+        }
+        cartProducts.forEach { cartProduct -> addProductToUserCart(userId, cartProduct) }
+        return getProductOfUserCart(userId)
     }
 }
