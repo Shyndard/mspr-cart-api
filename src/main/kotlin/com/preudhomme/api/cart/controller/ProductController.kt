@@ -1,7 +1,11 @@
 package com.preudhomme.api.cart.controller
 
 import com.preudhomme.api.cart.entity.Product
+import com.preudhomme.api.cart.entity.dto.CartProductCreation
+import com.preudhomme.api.cart.entity.dto.ProductCreation
 import com.preudhomme.api.cart.service.ProductService
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import java.util.*
 import javax.enterprise.inject.Default
@@ -14,7 +18,7 @@ import javax.ws.rs.core.Response
 @Tag(name = "product", description = "Product operations.")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-class ProductsController {
+class ProductController {
 
     @Inject
     @field: Default
@@ -32,8 +36,9 @@ class ProductsController {
     }
 
     @POST
-    fun create(): Response  {
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build()
+    @APIResponse(responseCode = "201", description = "Creating product")
+    fun create(@RequestBody product: ProductCreation): Product? {
+        return productService.create(product);
     }
 
     @PUT

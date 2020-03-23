@@ -2,6 +2,16 @@ kind: pipeline
 type: kubernetes
 name: default
 
+services:
+  - name: postgres
+    image: postgres:latest
+    ports:
+      - 5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+
 steps:
   - name: code-analysis
     image: aosapps/drone-sonar-plugin
@@ -12,6 +22,10 @@ steps:
     image: maven:3.6.3-jdk-8
     commands:
       - mvn test
+    environment:
+      DB_URL: jdbc:postgresql://localhost:5432/postgres
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
   - name: build
     image: maven:3.6.3-jdk-8
     commands:
