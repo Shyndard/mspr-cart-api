@@ -26,6 +26,7 @@ steps:
       DB_URL: jdbc:postgresql://localhost:5432/postgres
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+    depends_on: [postgres]
   - name: build
     image: maven:3.6.3-jdk-8
     commands:
@@ -46,7 +47,7 @@ steps:
         from_secret: GITHUB_EMAIL
     depends_on: [build, test, code-analysis]
     when:
-      branch: tag
+      event: tag
   - name: rollout
     image: pabloclsn/kubectl-docker:latest
     commands:
@@ -64,4 +65,4 @@ steps:
         from_secret: KUBE_CONFIG
     depends_on: [create_docker]
     when:
-      branch: tag
+      event: tag
