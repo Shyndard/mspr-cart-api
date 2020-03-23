@@ -12,11 +12,12 @@ steps:
     image: maven:3.6.3-jdk-8
     commands:
       - mvn test
-  - name: build
+  - name: compile
     image: maven:3.6.3-jdk-8
     commands:
       - mvn clean install -DskipTests=true
 
+---
 kind: pipeline
 name: deploy
 type: kubernetes
