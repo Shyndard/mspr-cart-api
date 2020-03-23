@@ -3,6 +3,14 @@ type: kubernetes
 name: default
 
 steps:
+  - name: install-dependencies
+    image: maven:3.6.3-jdk-8
+    commands:
+      - mvn dependency:purge-local-repository
+      - mvn dependency:resolve
+    volumes:
+      - name: m2-repo
+        path: ~/.m2/repository
   - name: code-analysis
     image: aosapps/drone-sonar-plugin
     settings:
@@ -12,10 +20,15 @@ steps:
     image: maven:3.6.3-jdk-8
     commands:
       - mvn test
-  - name: build
+    depends_on: [install-dependencies]
+  - name: compile
     image: maven:3.6.3-jdk-8
     commands:
       - mvn clean install -DskipTests=true
+    volumes:
+      - name: m2-repo
+        path: ~/.m2/repository
+    depends_on: [install-dependencies]
   - name: create_docker
     image: banzaicloud/drone-kaniko
     settings:
@@ -51,3 +64,7 @@ steps:
     depends_on: [create_docker]
     when:
       event: tag
+
+volumes:
+  - name: m2-repo
+    temp: {}
