@@ -1,6 +1,5 @@
 kind: pipeline
-type: kubernetes
-name: default
+name: build
 
 steps:
   - name: code-analysis
@@ -16,6 +15,12 @@ steps:
     image: maven:3.6.3-jdk-8
     commands:
       - mvn clean install -DskipTests=true
+
+---
+kind: pipeline
+name: deploy
+
+steps:
   - name: create_docker
     image: banzaicloud/drone-kaniko
     settings:
@@ -30,9 +35,6 @@ steps:
     environment:
       GITHUB_EMAIL:
         from_secret: GITHUB_EMAIL
-    depends_on: [build, test, code-analysis]
-    when:
-      branch: master
   - name: rollout
     image: pabloclsn/kubectl-docker:latest
     commands:
@@ -49,3 +51,7 @@ steps:
       KUBE_CONFIG:
         from_secret: KUBE_CONFIG
     depends_on: [create_docker]
+  when:
+    branch: master
+  depends_on:
+    - build
