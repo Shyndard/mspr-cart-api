@@ -36,12 +36,12 @@ class CartService {
 
     fun getProductOfUserCart(userId: UUID): Array<CartProduct> {
         val connection = defaultDataSource.connection
-        val preStatement: PreparedStatement = connection.prepareStatement("select p.*, cp.amount as amount, v.name as vat_type from cart_product as cp JOIN product as p on p.id = cp.product_id JOIN vat AS v ON v.id = p.vat where user_id = ?")
+        val preStatement: PreparedStatement = connection.prepareStatement("select p.*, cp.amount as amount, v.name as vat_type, c.name as category_name from cart_product as cp JOIN product as p on p.id = cp.product_id JOIN vat AS v ON v.id = p.vat JOIN category as c ON c.id = p.category where user_id = ?")
         preStatement.setObject(1, userId)
         val result: ResultSet = preStatement.executeQuery()
         var list = mutableListOf<CartProduct>()
         while(result.next()) {
-            list.add(CartProduct(result.getObject("id") as UUID, result.getString("name"), result.getFloat("price"), result.getInt("amount"), result.getString("vat_type")))
+            list.add(CartProduct(result.getObject("id") as UUID, result.getString("name"), result.getFloat("price"), result.getInt("amount"), result.getString("vat_type"), result.getString("category_name")))
         }
         result.close()
         preStatement.close()

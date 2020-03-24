@@ -5,6 +5,7 @@ import com.preudhomme.api.cart.entity.dto.CartCreation
 import com.preudhomme.api.cart.entity.dto.CartProductCreation
 import com.preudhomme.api.cart.entity.dto.ProductCreation
 import com.preudhomme.api.cart.service.CartService
+import com.preudhomme.api.cart.service.CategoryService
 import com.preudhomme.api.cart.service.ProductService
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
@@ -20,6 +21,7 @@ import javax.inject.Inject
 
 
 @QuarkusTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 open class CartServiceTest {
 
     @Inject
@@ -29,6 +31,16 @@ open class CartServiceTest {
     @Inject
     @field: Default
     lateinit var productService: ProductService
+
+    @Inject
+    @field: Default
+    lateinit var categoryService: CategoryService
+
+    @BeforeAll
+    fun init() {
+        categoryService.clear()
+        categoryService.create("none")
+    }
 
     @BeforeEach
     fun initEach() {
@@ -46,7 +58,7 @@ open class CartServiceTest {
     @Test
     fun testCreateCartWithProducts() {
         val userId = UUID.randomUUID()
-        val product = productService.create(ProductCreation("item", 100f, "normal"))?: fail("Product creation failed")
+        val product = productService.create(getProductCreation())?: fail("Product creation failed")
         val cart = cartService.createUserCart(CartCreation(userId, arrayOf(CartProductCreation(product.id, 10))))?: fail("User cart creation failed")
         assertTrue(userId == cart.userId && cart.products.size == 1 && cart.products[0].id == product.id && cart.products[0].amount == 10)
     }
@@ -54,7 +66,7 @@ open class CartServiceTest {
     @Test
     fun testGetUserCartProducts() {
         val userId = UUID.randomUUID()
-        val product = productService.create(ProductCreation("item", 100f, "normal"))?: fail("Product creation failed")
+        val product = productService.create(getProductCreation())?: fail("Product creation failed")
         cartService.createUserCart(CartCreation(userId, arrayOf(CartProductCreation(product.id, 10))))?: fail("User cart creation failed")
         val userCartProducts = cartService.getProductOfUserCart(userId)
         assertTrue(userCartProducts.size == 1 && userCartProducts[0].id == product.id && userCartProducts[0].amount == 10)
@@ -63,7 +75,7 @@ open class CartServiceTest {
     @Test
     fun testUpdateUserCartProducts() {
         val userId = UUID.randomUUID()
-        val product = productService.create(ProductCreation("item", 100f, "normal"))?: fail("Product creation failed")
+        val product = productService.create(getProductCreation())?: fail("Product creation failed")
         cartService.createUserCart(CartCreation(userId, arrayOf(CartProductCreation(product.id, 10))))?: fail("User cart creation failed")
         val userCartProducts = cartService.updateProductsOfUserCart(userId, arrayOf(CartProductCreation(product.id, 50)))
         assertTrue(userCartProducts.size == 1 && userCartProducts[0].id == product.id && userCartProducts[0].amount == 50)
@@ -72,9 +84,13 @@ open class CartServiceTest {
     @Test
     fun testDeleteUserCartProduct() {
         val userId = UUID.randomUUID()
-        val product = productService.create(ProductCreation("item", 100f, "normal"))?: fail("Product creation failed")
+        val product = productService.create(getProductCreation())?: fail("Product creation failed")
         cartService.createUserCart(CartCreation(userId, arrayOf(CartProductCreation(product.id, 10))))?: fail("User cart creation failed")
         val userCartProducts = cartService.deleteProductsOfUserCart(userId, arrayOf(product.id))
         assertTrue(userCartProducts.isEmpty())
+    }
+
+    private fun getProductCreation(): ProductCreation {
+        return ProductCreation("another item", 500.5f, "normal", "none", "a description super cool", "another logo url")
     }
 }
