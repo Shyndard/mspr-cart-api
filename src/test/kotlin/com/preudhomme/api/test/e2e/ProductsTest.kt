@@ -1,4 +1,4 @@
-package com.preudhomme.api.cart
+package com.preudhomme.api.test.e2e
 
 import com.preudhomme.api.cart.service.ProductService
 import io.quarkus.test.junit.QuarkusTest

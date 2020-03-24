@@ -1,4 +1,4 @@
-package com.preudhomme.api.cart
+package com.preudhomme.api.test.e2e
 
 import com.preudhomme.api.cart.entity.Product
 import com.preudhomme.api.cart.entity.dto.ProductCreation
@@ -20,7 +20,6 @@ import javax.inject.Inject
 
 
 @QuarkusTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 open class CartsTest {
 
     @Inject
@@ -91,19 +90,19 @@ open class CartsTest {
     fun testCreateCartAndAddThenUpdateProduct() {
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
         val product = productService.create(ProductCreation("item", 100.99f, "normal"))!!
-        val postCartPayload : String = "{\"products\":[],\"userId\":\"$userId\"}"
+        val postCartPayload : String = "{\"products\":[{\"amount\": 5,\"id\": \"${product.id}\"}],\"userId\":\"$userId\"}"
         given()
                 .contentType(ContentType.JSON)
                 .body(postCartPayload)
                 .post("carts")
 
-        val postPayload : String = "[{\"amount\": 5,\"id\": \"${product.id}\"}]"
+        val postPayload : String = "[{\"amount\": 18,\"id\": \"${product.id}\"}]"
         given()
                 .contentType(ContentType.JSON)
                 .body(postPayload)
-                .post("/carts/user/$userId/products")
+                .put("/carts/user/$userId/products")
                 .then()
                 .statusCode(200)
-                .body(CoreMatchers.containsString("\"amount\":5"), CoreMatchers.containsString("\"id\":\"${product.id.toString()}\""))
+                .body(CoreMatchers.containsString("\"amount\":18"), CoreMatchers.containsString("\"id\":\"${product.id.toString()}\""))
     }
 }
