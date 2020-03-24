@@ -1,4 +1,4 @@
-package com.preudhomme.api.e2e
+package com.preudhomme.api.test.e2e
 
 import com.preudhomme.api.cart.entity.Product
 import com.preudhomme.api.cart.entity.dto.ProductCreation

@@ -1,18 +1,10 @@
-package com.preudhomme.api.unit
+package com.preudhomme.api.test.unit
 
-import com.preudhomme.api.cart.entity.Product
 import com.preudhomme.api.cart.entity.dto.ProductCreation
-import com.preudhomme.api.cart.service.CartService
 import com.preudhomme.api.cart.service.ProductService
 import io.quarkus.test.junit.QuarkusTest
-import io.restassured.RestAssured
-import io.restassured.RestAssured.given
-import io.restassured.http.ContentType
-import org.hamcrest.CoreMatchers
-import org.hamcrest.CoreMatchers.`is`
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
-import java.util.*
 import javax.enterprise.inject.Default
 import javax.inject.Inject
 
