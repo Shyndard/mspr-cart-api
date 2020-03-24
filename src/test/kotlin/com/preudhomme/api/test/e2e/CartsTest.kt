@@ -3,6 +3,7 @@ package com.preudhomme.api.test.e2e
 import com.preudhomme.api.cart.entity.Product
 import com.preudhomme.api.cart.entity.dto.ProductCreation
 import com.preudhomme.api.cart.service.CartService
+import com.preudhomme.api.cart.service.CategoryService
 import com.preudhomme.api.cart.service.ProductService
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
@@ -10,16 +11,14 @@ import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.`is`
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import java.util.*
 import javax.enterprise.inject.Default
 import javax.inject.Inject
 
 
 @QuarkusTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 open class CartsTest {
 
     @Inject
@@ -30,7 +29,17 @@ open class CartsTest {
     @field: Default
     lateinit var productService: ProductService
 
+    @Inject
+    @field: Default
+    lateinit var categoryService: CategoryService
+
     lateinit var userId: UUID
+
+    @BeforeAll
+    fun init() {
+        categoryService.clear()
+        categoryService.create("none")
+    }
 
     @BeforeEach
     fun initEach() {
@@ -69,7 +78,7 @@ open class CartsTest {
     @Test
     fun testCreateCartAndAddProduct() {
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-        val product = productService.create(ProductCreation("item", 100.99f, "normal"))!!
+        val product = productService.create(ProductCreation("item", 100.99f, "normal", "none", "super description", "a logo url"))?: fail("Product creation failed")
         val postCartPayload : String = "{\"products\":[],\"userId\":\"$userId\"}"
         given()
                 .contentType(ContentType.JSON)
@@ -89,7 +98,7 @@ open class CartsTest {
     @Test
     fun testCreateCartAndAddThenUpdateProduct() {
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-        val product = productService.create(ProductCreation("item", 100.99f, "normal"))!!
+        val product = productService.create(ProductCreation("item", 100.99f, "normal", "none", "super description", "a logo url"))?: fail("Product creation failed")
         val postCartPayload : String = "{\"products\":[{\"amount\": 5,\"id\": \"${product.id}\"}],\"userId\":\"$userId\"}"
         given()
                 .contentType(ContentType.JSON)

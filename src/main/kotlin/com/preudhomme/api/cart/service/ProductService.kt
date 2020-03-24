@@ -21,11 +21,11 @@ class ProductService {
 
     fun getAllProducts(): Array<Product> {
         val connection: Connection = defaultDataSource.connection
-        val preStatement: PreparedStatement = connection.prepareStatement("select p.*, v.name AS tva_type from product p JOIN vat as v ON p.vat = v.id")
+        val preStatement: PreparedStatement = connection.prepareStatement("select p.*, v.name AS tva_type, c.name AS category_name from product p JOIN vat as v ON p.vat = v.id JOIN category as c ON p.category = c.id")
         val result: ResultSet = preStatement.executeQuery()
         var list = mutableListOf<Product>()
         while(result.next()) {
-            list.add(Product(result.getObject("id") as UUID, result.getString("name"), result.getFloat("price"), result.getString("tva_type")))
+            list.add(Product(result.getObject("id") as UUID, result.getString("name"), result.getFloat("price"), result.getString("tva_type"), result.getString("category_name"), result.getString("description"), result.getString("logo_url")))
         }
         result.close()
         preStatement.close()
@@ -35,13 +35,13 @@ class ProductService {
 
     fun getProductById(productId: UUID) : Product? {
         val connection: Connection = defaultDataSource.connection
-        val preStatement: PreparedStatement = connection.prepareStatement("select p.*, v.name AS tva_type from product p JOIN vat as v ON p.vat = v.id where p.id = ?")
+        val preStatement: PreparedStatement = connection.prepareStatement("select p.*, v.name AS tva_type, c.name AS category_name from product p JOIN vat as v ON p.vat = v.id JOIN category as c ON p.category = c.id where p.id = ?")
 
         preStatement.setObject(1, productId)
         val result: ResultSet = preStatement.executeQuery()
         var product: Product? = null
         if (result.next()) {
-            product = Product(result.getObject("id") as UUID, result.getString("name"), result.getFloat("price"), result.getString("tva_type"))
+            product = Product(result.getObject("id") as UUID, result.getString("name"), result.getFloat("price"), result.getString("tva_type"), result.getString("category_name"), result.getString("description"), result.getString("logo_url"))
         }
 
         result.close()
@@ -52,10 +52,13 @@ class ProductService {
 
     fun create(product: ProductCreation): Product? {
         val connection: Connection = defaultDataSource.connection
-        val preStatement: PreparedStatement = connection.prepareStatement("INSERT INTO product (name, price, vat) VALUES (?, ?, (SELECT id FROM vat WHERE name ILIKE ?))", Statement.RETURN_GENERATED_KEYS)
+        val preStatement: PreparedStatement = connection.prepareStatement("INSERT INTO product (name, price, vat, category, description, logo_url) VALUES (?, ?, (SELECT id FROM vat WHERE name ILIKE ?), (SELECT id FROM category WHERE name ILIKE ?), ?, ?)", Statement.RETURN_GENERATED_KEYS)
         preStatement.setString(1, product.name)
         preStatement.setFloat(2, product.price)
         preStatement.setString(3, product.vatType)
+        preStatement.setString(4, product.category)
+        preStatement.setString(5, product.description)
+        preStatement.setString(6, product.logoUrl)
         var resultProduct: Product? = null
         try {
             preStatement.executeUpdate()
