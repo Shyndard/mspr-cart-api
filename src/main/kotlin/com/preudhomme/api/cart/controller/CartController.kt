@@ -28,7 +28,7 @@ class CartController {
     @GET
     @Path("/user/{userId}")
     @APIResponse(responseCode = "200", description = "Getting user cart")
-    fun getByUser(@PathParam("userId") userId: UUID): Cart? {
+    fun getByUser(@PathParam("userId") userId: String): Cart? {
         return cartService.getCartByUser(userId)
     }
 
@@ -41,28 +41,28 @@ class CartController {
     @POST
     @APIResponse(responseCode = "200", description = "Create user cart products")
     @Path("/user/{userId}/products")
-    fun createProducts(@PathParam("userId") userId: UUID, @RequestBody cartProducts: Array<CartProductCreation>): Array<CartProduct> {
+    fun createProducts(@PathParam("userId") userId: String, @RequestBody cartProducts: Array<CartProductCreation>): Array<CartProduct> {
         return cartService.addProductsToUserCart(userId, cartProducts);
     }
 
     @PUT
     @APIResponse(responseCode = "200", description = "Updating user cart products")
     @Path("/user/{userId}/products")
-    fun totalUpdate(@PathParam("userId") userId: UUID, @RequestBody cartProducts: Array<CartProductCreation>): Array<CartProduct> {
+    fun totalUpdate(@PathParam("userId") userId: String, @RequestBody cartProducts: Array<CartProductCreation>): Array<CartProduct> {
         return cartService.totalUpdate(userId, cartProducts);
     }
 
     @PATCH
     @APIResponse(responseCode = "200", description = "Patching user cart products")
     @Path("/user/{userId}/products")
-    fun partialUpdate(@PathParam("userId") userId: UUID, @RequestBody cartProducts: Array<CartProductCreation>): Array<CartProduct> {
+    fun partialUpdate(@PathParam("userId") userId: String, @RequestBody cartProducts: Array<CartProductCreation>): Array<CartProduct> {
         return cartService.updateProductsOfUserCart(userId, cartProducts);
     }
 
     @DELETE
     @APIResponse(responseCode = "200", description = "Deleting user cart products")
     @Path("/user/{userId}/products")
-    fun delete(@PathParam("userId") userId: UUID, @RequestBody cartProducts: Array<UUID>): Array<CartProduct> {
+    fun delete(@PathParam("userId") userId: String, @RequestBody cartProducts: Array<UUID>): Array<CartProduct> {
         return cartService.deleteProductsOfUserCart(userId, cartProducts);
     }
 }

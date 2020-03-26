@@ -50,14 +50,14 @@ open class CartServiceTest {
 
     @Test
     fun testCreateCartWithNoProduct() {
-        val userId = UUID.randomUUID()
+        val userId = UUID.randomUUID().toString()
         val cart = cartService.createUserCart(CartCreation(userId, arrayOf()))?: fail("User cart creation failed")
         assertTrue(userId == cart.userId && cart.products.isEmpty())
     }
 
     @Test
     fun testCreateCartWithProducts() {
-        val userId = UUID.randomUUID()
+        val userId = UUID.randomUUID().toString()
         val product = productService.create(getProductCreation())?: fail("Product creation failed")
         val cart = cartService.createUserCart(CartCreation(userId, arrayOf(CartProductCreation(product.id, 10))))?: fail("User cart creation failed")
         assertTrue(userId == cart.userId && cart.products.size == 1 && cart.products[0].id == product.id && cart.products[0].amount == 10)
@@ -65,7 +65,7 @@ open class CartServiceTest {
 
     @Test
     fun testGetUserCartProducts() {
-        val userId = UUID.randomUUID()
+        val userId = UUID.randomUUID().toString()
         val product = productService.create(getProductCreation())?: fail("Product creation failed")
         cartService.createUserCart(CartCreation(userId, arrayOf(CartProductCreation(product.id, 10))))?: fail("User cart creation failed")
         val userCartProducts = cartService.getProductOfUserCart(userId)
@@ -74,7 +74,7 @@ open class CartServiceTest {
 
     @Test
     fun testUpdateUserCartProducts() {
-        val userId = UUID.randomUUID()
+        val userId = UUID.randomUUID().toString()
         val product = productService.create(getProductCreation())?: fail("Product creation failed")
         cartService.createUserCart(CartCreation(userId, arrayOf(CartProductCreation(product.id, 10))))?: fail("User cart creation failed")
         val userCartProducts = cartService.updateProductsOfUserCart(userId, arrayOf(CartProductCreation(product.id, 50)))
@@ -83,7 +83,7 @@ open class CartServiceTest {
 
     @Test
     fun testDeleteUserCartProduct() {
-        val userId = UUID.randomUUID()
+        val userId = UUID.randomUUID().toString()
         val product = productService.create(getProductCreation())?: fail("Product creation failed")
         cartService.createUserCart(CartCreation(userId, arrayOf(CartProductCreation(product.id, 10))))?: fail("User cart creation failed")
         val userCartProducts = cartService.deleteProductsOfUserCart(userId, arrayOf(product.id))
