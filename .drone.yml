@@ -64,5 +64,5 @@ steps:
       KUBE_CONFIG:
         from_secret: KUBE_CONFIG
     depends_on: [create_docker]
-    when:
-      event: tag
+    #when:
+      #event: tag
