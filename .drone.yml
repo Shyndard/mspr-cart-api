@@ -46,8 +46,8 @@ steps:
       GITHUB_EMAIL:
         from_secret: GITHUB_EMAIL
     depends_on: [build, test, code-analysis]
-    #when:
-      #event: tag
+    when:
+      event: tag
   - name: rollout
     image: pabloclsn/kubectl-docker:latest
     commands:
@@ -64,5 +64,5 @@ steps:
       KUBE_CONFIG:
         from_secret: KUBE_CONFIG
     depends_on: [create_docker]
-    #when:
-      #event: tag
+    when:
+      event: tag
