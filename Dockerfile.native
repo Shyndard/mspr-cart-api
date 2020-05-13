@@ -8,7 +8,7 @@
 ### FIRST STEP : BUILD PROJECT ###
 ##################################
 
-FROM oracle/graalvm-ce:19.3.1-java8 as builder
+FROM oracle/graalvm-ce:19.3.2-java8 as builder
 
 WORKDIR /maven/
 
